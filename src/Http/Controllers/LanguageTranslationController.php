@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JoeDixon\Translation\Drivers\Translation;
+use JoeDixon\Translation\Events\TranslationChangedEvent;
 use JoeDixon\Translation\Http\Requests\TranslationRequest;
 
 class LanguageTranslationController extends Controller
@@ -60,6 +61,8 @@ class LanguageTranslationController extends Controller
             $this->translation->addSingleTranslation($language, 'single', $request->get('key'), $request->get('value') ?: '');
         }
 
+        TranslationChangedEvent::dispatch($language);
+
         return redirect()
             ->route('languages.translations.index', $language)
             ->with('success', __('translation::translation.translation_added'));
@@ -67,11 +70,13 @@ class LanguageTranslationController extends Controller
 
     public function update(Request $request, $language)
     {
-        if (! Str::contains($request->get('group'), 'single')) {
+        if (!Str::contains($request->get('group'), 'single')) {
             $this->translation->addGroupTranslation($language, $request->get('group'), $request->get('key'), $request->get('value') ?: '');
         } else {
             $this->translation->addSingleTranslation($language, $request->get('group'), $request->get('key'), $request->get('value') ?: '');
         }
+
+        TranslationChangedEvent::dispatch($language);
 
         return ['success' => true];
     }
