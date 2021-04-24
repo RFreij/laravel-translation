@@ -61,8 +61,6 @@ class LanguageTranslationController extends Controller
             $this->translation->addSingleTranslation($language, 'single', $request->get('key'), $request->get('value') ?: '');
         }
 
-        TranslationChangedEvent::dispatch($language);
-
         return redirect()
             ->route('languages.translations.index', $language)
             ->with('success', __('translation::translation.translation_added'));
@@ -75,8 +73,6 @@ class LanguageTranslationController extends Controller
         } else {
             $this->translation->addSingleTranslation($language, $request->get('group'), $request->get('key'), $request->get('value') ?: '');
         }
-
-        TranslationChangedEvent::dispatch($language);
 
         return ['success' => true];
     }
